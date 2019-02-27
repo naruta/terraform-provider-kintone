@@ -6,6 +6,7 @@ type CreateApplicationUseCaseCommand struct {
 	Setting Setting
 	Status  Status
 	Fields  []Field
+	Views   []View
 }
 
 type CreateApplicationUseCase struct {
@@ -33,6 +34,11 @@ func (uc *CreateApplicationUseCase) Execute(ctx context.Context, cmd CreateAppli
 	}
 
 	revision, err = uc.apiClient.UpdatePreviewApplicationStatus(ctx, appId, revision, cmd.Status)
+	if err != nil {
+		return appId, revision, err
+	}
+
+	revision, err = uc.apiClient.UpdatePreviewApplicationViews(ctx, appId, revision, cmd.Views)
 	if err != nil {
 		return appId, revision, err
 	}

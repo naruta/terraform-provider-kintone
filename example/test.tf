@@ -71,6 +71,13 @@ resource "kintone_application" "test_application_2" {
     label = "AppId"
     type  = "SINGLE_LINE_TEXT"
   }
+
+  view {
+    name   = "Test View"
+    index  = 0
+    type   = "LIST"
+    fields = ["code_app"]
+  }
 }
 
 resource "kintone_record" "test_record_2" {

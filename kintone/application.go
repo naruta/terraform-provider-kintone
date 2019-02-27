@@ -30,6 +30,7 @@ type Application struct {
 	Id       AppId
 	Setting  Setting
 	Fields   []Field
+	Views    []View
 	Status   Status
 	Revision Revision
 }

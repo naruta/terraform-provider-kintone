@@ -78,6 +78,34 @@ func (c *ApiClientImpl) UpdatePreviewApplicationStatus(ctx context.Context, appI
 	return kintone.Revision(resp.Revision), nil
 }
 
+func (c *ApiClientImpl) UpdatePreviewApplicationViews(ctx context.Context, appId kintone.AppId, revision kintone.Revision, views []kintone.View) (kintone.Revision, error) {
+	requestViews := map[string]raw_client.PutPreviewAppViewsRequestView{}
+
+	for _, view := range views {
+		var fields []string
+		for _, f := range view.Fields {
+			fields = append(fields, f.String())
+		}
+
+		requestViews[view.Name] = raw_client.PutPreviewAppViewsRequestView{
+			Name:   view.Name,
+			Index:  view.Index,
+			Type:   view.Type.String(),
+			Fields: fields,
+		}
+	}
+
+	resp, err := raw_client.PutPreviewAppViews(ctx, c.rawClient, raw_client.PutPreviewAppViewsRequest{
+		App:      appId.String(),
+		Revision: revision.String(),
+		Views:    requestViews,
+	})
+	if err != nil {
+		return kintone.Revision(""), err
+	}
+	return kintone.Revision(resp.Revision), nil
+}
+
 func (c *ApiClientImpl) DeployApplication(ctx context.Context, appId kintone.AppId, revision kintone.Revision) error {
 	_, err := raw_client.PostPreviewAppDeploy(ctx, c.rawClient, raw_client.PostPreviewAppDeployRequest{
 		Apps: []raw_client.PostPreviewAppDeployRequestApp{

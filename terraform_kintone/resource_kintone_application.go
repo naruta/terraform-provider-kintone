@@ -106,6 +106,31 @@ func resourceKintoneApplication() *schema.Resource {
 					},
 				},
 			},
+			"view": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"name": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"index": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"type": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"fields": {
+							Type:     schema.TypeList,
+							Required: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+						},
+					},
+				},
+			},
 		},
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -159,6 +184,28 @@ func convertAction(actionList []interface{}) []kintone.Action {
 	return actions
 }
 
+func convertFieldCodeList(fieldCodeList []interface{}) []kintone.FieldCode {
+	var fieldCodes []kintone.FieldCode
+	for _, f := range fieldCodeList {
+		fieldCodes = append(fieldCodes, kintone.FieldCode(f.(string)))
+	}
+	return fieldCodes
+}
+
+func convertView(viewList []interface{}) []kintone.View {
+	var views []kintone.View
+	for _, viewMap := range viewList {
+		view := viewMap.(map[string]interface{})
+		views = append(views, kintone.View{
+			Index:  view["index"].(string),
+			Name:   view["name"].(string),
+			Type:   kintone.ViewType(view["type"].(string)),
+			Fields: convertFieldCodeList(view["fields"].([]interface{})),
+		})
+	}
+	return views
+}
+
 func resourceKintoneApplicationCreate(d *schema.ResourceData, m interface{}) error {
 	config := m.(*Config)
 	apiClient := newClient(*config)
@@ -194,6 +241,11 @@ func resourceKintoneApplicationCreate(d *schema.ResourceData, m interface{}) err
 		status.Actions = convertAction(actionList)
 	}
 	cmd.Status = status
+
+	if v, ok := d.GetOk("view"); ok {
+		viewList := v.([]interface{})
+		cmd.Views = convertView(viewList)
+	}
 
 	appId, revision, err := useCase.Execute(ctx, cmd)
 	if err != nil {
