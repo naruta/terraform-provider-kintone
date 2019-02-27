@@ -4,3 +4,4 @@ vendor/*/
 *.backup
 example/.terraform
 example/terraform.tfvars
+/terraform-provider-kintone

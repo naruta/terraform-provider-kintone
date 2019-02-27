@@ -11,7 +11,7 @@ build:
 	go build -o $(PKG_NAME)
 
 clean:
-	rm $(PKG_NAME)
+	rm -f $(PKG_NAME)
 
 testacc:
 	TF_ACC=1 go test $(TEST) -v
