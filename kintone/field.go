@@ -4,6 +4,7 @@ type FieldType string
 
 const (
 	FieldSingleLineText = "SINGLE_LINE_TEXT"
+	FieldMultiLineText  = "MULTI_LINE_TEXT"
 	FieldNumber         = "NUMBER"
 )
 

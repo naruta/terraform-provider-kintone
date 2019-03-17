@@ -21,6 +21,14 @@ func TestFieldPropertyMapper(t *testing.T) {
 			},
 		},
 		{
+			title: "MULTI_LINE_TEXT",
+			property: raw_client.FieldProperty{
+				Type:  "MULTI_LINE_TEXT",
+				Code:  "text-2",
+				Label: "🍣🍺",
+			},
+		},
+		{
 			title: "NUMBER",
 			property: raw_client.FieldProperty{
 				Type:  "NUMBER",

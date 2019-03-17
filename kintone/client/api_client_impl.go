@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/naruta/terraform-provider-kintone/kintone"
 	"github.com/naruta/terraform-provider-kintone/kintone/raw_client"
+	"log"
 	"strconv"
 )
 
@@ -125,7 +126,10 @@ func (c *ApiClientImpl) FetchApplication(ctx context.Context, appId kintone.AppI
 	for _, p := range fieldsResp.Properties {
 		field, err := mapper.PropertyToField(&p.FieldProperty)
 		if err != nil {
-			return kintone.Application{}, err
+			// Ignore unknown fields
+			// TODO: return an error here once we support all field types
+			log.Printf("ignore: %v", err)
+			continue
 		}
 		fields = append(fields, field)
 	}

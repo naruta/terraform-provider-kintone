@@ -60,6 +60,7 @@ func resourceKintoneApplication() *schema.Resource {
 							ValidateFunc: validation.StringInSlice([]string{
 								kintone.FieldSingleLineText,
 								kintone.FieldNumber,
+								kintone.FieldMultiLineText,
 							}, false),
 						},
 					},

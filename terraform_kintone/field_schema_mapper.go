@@ -15,6 +15,8 @@ func (m *fieldSchemaMapper) SchemaToField(fieldMap map[string]interface{}) (kint
 	switch fieldType {
 	case "SINGLE_LINE_TEXT":
 		return field.NewSingleLineText(code, label), nil
+	case "MULTI_LINE_TEXT":
+		return field.NewMultiLineText(code, label), nil
 	case "NUMBER":
 		return field.NewNumber(code, label), nil
 	default:

@@ -20,6 +20,14 @@ func TestFieldSchemaMapper(t *testing.T) {
 			},
 		},
 		{
+			title: "MULTI_LINE_TEXT",
+			fieldMap: map[string]interface{}{
+				"type":  "MULTI_LINE_TEXT",
+				"code":  "text-2",
+				"label": "🍣🍺",
+			},
+		},
+		{
 			title: "NUMBER",
 			fieldMap: map[string]interface{}{
 				"type":  "NUMBER",

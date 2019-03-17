@@ -22,9 +22,7 @@ func (uc *FetchApplicationUseCase) Execute(ctx context.Context, cmd FetchApplica
 
 	var handleFields []Field
 	for _, f := range app.Fields {
-		if f.Type() == FieldSingleLineText || f.Type() == FieldNumber {
-			handleFields = append(handleFields, f)
-		}
+		handleFields = append(handleFields, f)
 	}
 	app.Fields = handleFields
 	return app, nil
