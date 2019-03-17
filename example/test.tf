@@ -7,6 +7,7 @@ resource "kintone_application" "test_application_1" {
 
   field = { code = "code_number" label = "number" type = "NUMBER" }
   field = { code = "code_title" label = "title" type = "SINGLE_LINE_TEXT" }
+  field = { code = "code_description" label = "description" type = "MULTI_LINE_TEXT" }
 
   status_enable = true
 
