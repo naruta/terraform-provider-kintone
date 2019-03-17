@@ -3,9 +3,7 @@ package client
 import (
 	"context"
 	"github.com/naruta/terraform-provider-kintone/kintone"
-	"github.com/naruta/terraform-provider-kintone/kintone/field"
 	"github.com/naruta/terraform-provider-kintone/kintone/raw_client"
-	"github.com/pkg/errors"
 	"strconv"
 )
 
@@ -123,8 +121,9 @@ func (c *ApiClientImpl) FetchApplication(ctx context.Context, appId kintone.AppI
 	}
 
 	var fields []kintone.Field
+	mapper := fieldPropertyMapper{}
 	for _, p := range fieldsResp.Properties {
-		field, err := createFieldFromProperty(&p)
+		field, err := mapper.PropertyToField(&p)
 		if err != nil {
 			return kintone.Application{}, err
 		}
@@ -169,24 +168,12 @@ func (c *ApiClientImpl) FetchApplication(ctx context.Context, appId kintone.AppI
 	}, nil
 }
 
-func createFieldFromProperty(p *raw_client.GetAppFormFieldsRequestProperty) (kintone.Field, error) {
-	switch p.Type {
-	case "SINGLE_LINE_TEXT":
-		return field.NewSingleLineText(kintone.FieldCode(p.Code), p.Label), nil
-	case "NUMBER":
-		return field.NewNumber(kintone.FieldCode(p.Code), p.Label), nil
-	default:
-		return nil, errors.Errorf("unknown field type: %s", p.Type)
-	}
-}
-
 func (c *ApiClientImpl) CreatePreviewApplicationFormFields(ctx context.Context, appId kintone.AppId, revision kintone.Revision, fields []kintone.Field) (kintone.Revision, error) {
 	properties := map[string]raw_client.PostPreviewAppFormFieldsRequestProperty{}
+	mapper := fieldPropertyMapper{}
 	for _, field := range fields {
 		properties[field.Code().String()] = raw_client.PostPreviewAppFormFieldsRequestProperty{
-			Code:  field.Code().String(),
-			Label: field.Label(),
-			Type:  field.Type().String(),
+			FieldProperty: mapper.FieldToProperty(field),
 		}
 	}
 
@@ -203,11 +190,10 @@ func (c *ApiClientImpl) CreatePreviewApplicationFormFields(ctx context.Context, 
 
 func (c *ApiClientImpl) UpdatePreviewApplicationFormFields(ctx context.Context, appId kintone.AppId, revision kintone.Revision, fields []kintone.Field) (kintone.Revision, error) {
 	properties := map[string]raw_client.PutPreviewAppFormFieldsRequestProperty{}
+	mapper := fieldPropertyMapper{}
 	for _, field := range fields {
 		properties[field.Code().String()] = raw_client.PutPreviewAppFormFieldsRequestProperty{
-			Code:  field.Code().String(),
-			Label: field.Label(),
-			Type:  field.Type().String(),
+			FieldProperty: mapper.FieldToProperty(field),
 		}
 	}
 
