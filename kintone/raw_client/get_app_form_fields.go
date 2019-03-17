@@ -14,9 +14,7 @@ type GetAppFormFieldsResponse struct {
 }
 
 type GetAppFormFieldsRequestProperty struct {
-	Code  string `json:"code"`
-	Label string `json:"label"`
-	Type  string `json:"type"`
+	FieldProperty
 }
 
 func GetAppFormFields(ctx context.Context, apiClient *ApiClient, req GetAppFormFieldsRequest) (*GetAppFormFieldsResponse, error) {

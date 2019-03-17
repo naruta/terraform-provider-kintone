@@ -9,7 +9,7 @@ import (
 
 type fieldPropertyMapper struct{}
 
-func (m *fieldPropertyMapper) PropertyToField(p *raw_client.GetAppFormFieldsRequestProperty) (kintone.Field, error) {
+func (m *fieldPropertyMapper) PropertyToField(p *raw_client.FieldProperty) (kintone.Field, error) {
 	switch p.Type {
 	case "SINGLE_LINE_TEXT":
 		return field.NewSingleLineText(kintone.FieldCode(p.Code), p.Label), nil

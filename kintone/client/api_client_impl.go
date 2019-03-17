@@ -123,7 +123,7 @@ func (c *ApiClientImpl) FetchApplication(ctx context.Context, appId kintone.AppI
 	var fields []kintone.Field
 	mapper := fieldPropertyMapper{}
 	for _, p := range fieldsResp.Properties {
-		field, err := mapper.PropertyToField(&p)
+		field, err := mapper.PropertyToField(&p.FieldProperty)
 		if err != nil {
 			return kintone.Application{}, err
 		}
