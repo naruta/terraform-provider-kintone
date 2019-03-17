@@ -6,8 +6,6 @@ import (
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/naruta/terraform-provider-kintone/kintone"
 	"github.com/naruta/terraform-provider-kintone/kintone/client"
-	"github.com/naruta/terraform-provider-kintone/kintone/field"
-	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -124,28 +122,15 @@ func newClient(config Config) kintone.ApiClient {
 
 func convertFields(fieldSet *schema.Set) ([]kintone.Field, error) {
 	var fields []kintone.Field
+	mapper := fieldSchemaMapper{}
 	for _, fieldMap := range fieldSet.List() {
-		field, err := convertField(fieldMap.(map[string]interface{}))
+		field, err := mapper.SchemaToField(fieldMap.(map[string]interface{}))
 		if err != nil {
 			return nil, err
 		}
 		fields = append(fields, field)
 	}
 	return fields, nil
-}
-
-func convertField(fieldMap map[string]interface{}) (kintone.Field, error) {
-	fieldType := kintone.FieldType(fieldMap["type"].(string))
-	code := kintone.FieldCode(fieldMap["code"].(string))
-	label := fieldMap["label"].(string)
-	switch fieldType {
-	case "SINGLE_LINE_TEXT":
-		return field.NewSingleLineText(code, label), nil
-	case "NUMBER":
-		return field.NewNumber(code, label), nil
-	default:
-		return nil, errors.Errorf("unknown field type: %s", fieldType)
-	}
 }
 
 func convertState(stateSet *schema.Set) []kintone.State {
@@ -243,12 +228,9 @@ func resourceKintoneApplicationRead(d *schema.ResourceData, m interface{}) error
 	d.Set("revision", app.Revision.String())
 
 	fields := make([]map[string]interface{}, 0, len(app.Fields))
+	mapper := fieldSchemaMapper{}
 	for _, f := range app.Fields {
-		fields = append(fields, map[string]interface{}{
-			"code":  f.Code().String(),
-			"label": f.Label(),
-			"type":  f.Type().String(),
-		})
+		fields = append(fields, mapper.FieldToSchema(f))
 	}
 	d.Set("field", fields)
 
