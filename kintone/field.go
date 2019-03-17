@@ -17,8 +17,8 @@ func (fc FieldCode) String() string {
 	return string(fc)
 }
 
-type Field struct {
-	Code      FieldCode
-	Label     string
-	FieldType FieldType
+type Field interface {
+	Type() FieldType
+	Code() FieldCode
+	Label() string
 }

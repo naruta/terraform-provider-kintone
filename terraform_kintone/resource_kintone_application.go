@@ -6,6 +6,8 @@ import (
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/naruta/terraform-provider-kintone/kintone"
 	"github.com/naruta/terraform-provider-kintone/kintone/client"
+	"github.com/naruta/terraform-provider-kintone/kintone/field"
+	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -120,17 +122,30 @@ func newClient(config Config) kintone.ApiClient {
 	})
 }
 
-func convertFields(fieldSet *schema.Set) []kintone.Field {
+func convertFields(fieldSet *schema.Set) ([]kintone.Field, error) {
 	var fields []kintone.Field
 	for _, fieldMap := range fieldSet.List() {
-		field := fieldMap.(map[string]interface{})
-		fields = append(fields, kintone.Field{
-			Code:      kintone.FieldCode(field["code"].(string)),
-			Label:     field["label"].(string),
-			FieldType: kintone.FieldType(field["type"].(string)),
-		})
+		field, err := convertField(fieldMap.(map[string]interface{}))
+		if err != nil {
+			return nil, err
+		}
+		fields = append(fields, field)
 	}
-	return fields
+	return fields, nil
+}
+
+func convertField(fieldMap map[string]interface{}) (kintone.Field, error) {
+	fieldType := kintone.FieldType(fieldMap["type"].(string))
+	code := kintone.FieldCode(fieldMap["code"].(string))
+	label := fieldMap["label"].(string)
+	switch fieldType {
+	case "SINGLE_LINE_TEXT":
+		return field.NewSingleLineText(code, label), nil
+	case "NUMBER":
+		return field.NewNumber(code, label), nil
+	default:
+		return nil, errors.Errorf("unknown field type: %s", fieldType)
+	}
 }
 
 func convertState(stateSet *schema.Set) []kintone.State {
@@ -174,7 +189,11 @@ func resourceKintoneApplicationCreate(d *schema.ResourceData, m interface{}) err
 
 	if v, ok := d.GetOk("field"); ok {
 		fieldSet := v.(*schema.Set)
-		cmd.Fields = convertFields(fieldSet)
+		fields, err := convertFields(fieldSet)
+		if err != nil {
+			return err
+		}
+		cmd.Fields = fields
 	}
 
 	status := kintone.Status{
@@ -226,9 +245,9 @@ func resourceKintoneApplicationRead(d *schema.ResourceData, m interface{}) error
 	fields := make([]map[string]interface{}, 0, len(app.Fields))
 	for _, f := range app.Fields {
 		fields = append(fields, map[string]interface{}{
-			"code":  f.Code.String(),
-			"label": f.Label,
-			"type":  f.FieldType.String(),
+			"code":  f.Code().String(),
+			"label": f.Label(),
+			"type":  f.Type().String(),
 		})
 	}
 	d.Set("field", fields)
@@ -259,16 +278,22 @@ func resourceKintoneApplicationRead(d *schema.ResourceData, m interface{}) error
 
 func findField(fields []kintone.Field, target kintone.Field) (kintone.Field, bool) {
 	for _, field := range fields {
-		if field.Code == target.Code {
+		if field.Code() == target.Code() {
 			return field, true
 		}
 	}
-	return kintone.Field{}, false
+	return nil, false
 }
 
-func diff(oldFieldSet, newFieldSet *schema.Set) ([]kintone.Field, []kintone.Field, []kintone.FieldCode) {
-	oldFields := convertFields(oldFieldSet)
-	newFields := convertFields(newFieldSet)
+func diff(oldFieldSet, newFieldSet *schema.Set) ([]kintone.Field, []kintone.Field, []kintone.FieldCode, error) {
+	oldFields, err := convertFields(oldFieldSet)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	newFields, err := convertFields(newFieldSet)
+	if err != nil {
+		return nil, nil, nil, err
+	}
 
 	var createFields []kintone.Field
 	var updateFields []kintone.Field
@@ -289,11 +314,11 @@ func diff(oldFieldSet, newFieldSet *schema.Set) ([]kintone.Field, []kintone.Fiel
 	for _, oldField := range oldFields {
 		_, found := findField(newFields, oldField)
 		if !found {
-			deleteFieldCodes = append(deleteFieldCodes, oldField.Code)
+			deleteFieldCodes = append(deleteFieldCodes, oldField.Code())
 		}
 	}
 
-	return createFields, updateFields, deleteFieldCodes
+	return createFields, updateFields, deleteFieldCodes, nil
 }
 
 func resourceKintoneApplicationUpdate(d *schema.ResourceData, m interface{}) error {
@@ -309,7 +334,11 @@ func resourceKintoneApplicationUpdate(d *schema.ResourceData, m interface{}) err
 	var deleteFieldCodes []kintone.FieldCode
 	if d.HasChange("field") {
 		oldFieldSet, newFieldSet := d.GetChange("field")
-		createFields, updateFields, deleteFieldCodes = diff(oldFieldSet.(*schema.Set), newFieldSet.(*schema.Set))
+		var err error
+		createFields, updateFields, deleteFieldCodes, err = diff(oldFieldSet.(*schema.Set), newFieldSet.(*schema.Set))
+		if err != nil {
+			return err
+		}
 	}
 
 	status := kintone.Status{

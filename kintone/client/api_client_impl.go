@@ -3,7 +3,9 @@ package client
 import (
 	"context"
 	"github.com/naruta/terraform-provider-kintone/kintone"
+	"github.com/naruta/terraform-provider-kintone/kintone/field"
 	"github.com/naruta/terraform-provider-kintone/kintone/raw_client"
+	"github.com/pkg/errors"
 	"strconv"
 )
 
@@ -122,11 +124,11 @@ func (c *ApiClientImpl) FetchApplication(ctx context.Context, appId kintone.AppI
 
 	var fields []kintone.Field
 	for _, p := range fieldsResp.Properties {
-		fields = append(fields, kintone.Field{
-			Code:      kintone.FieldCode(p.Code),
-			FieldType: kintone.FieldType(p.Type),
-			Label:     p.Label,
-		})
+		field, err := createFieldFromProperty(&p)
+		if err != nil {
+			return kintone.Application{}, err
+		}
+		fields = append(fields, field)
 	}
 
 	var states []kintone.State
@@ -167,13 +169,24 @@ func (c *ApiClientImpl) FetchApplication(ctx context.Context, appId kintone.AppI
 	}, nil
 }
 
+func createFieldFromProperty(p *raw_client.GetAppFormFieldsRequestProperty) (kintone.Field, error) {
+	switch p.Type {
+	case "SINGLE_LINE_TEXT":
+		return field.NewSingleLineText(kintone.FieldCode(p.Code), p.Label), nil
+	case "NUMBER":
+		return field.NewNumber(kintone.FieldCode(p.Code), p.Label), nil
+	default:
+		return nil, errors.Errorf("unknown field type: %s", p.Type)
+	}
+}
+
 func (c *ApiClientImpl) CreatePreviewApplicationFormFields(ctx context.Context, appId kintone.AppId, revision kintone.Revision, fields []kintone.Field) (kintone.Revision, error) {
 	properties := map[string]raw_client.PostPreviewAppFormFieldsRequestProperty{}
 	for _, field := range fields {
-		properties[field.Code.String()] = raw_client.PostPreviewAppFormFieldsRequestProperty{
-			Code:  field.Code.String(),
-			Label: field.Label,
-			Type:  field.FieldType.String(),
+		properties[field.Code().String()] = raw_client.PostPreviewAppFormFieldsRequestProperty{
+			Code:  field.Code().String(),
+			Label: field.Label(),
+			Type:  field.Type().String(),
 		}
 	}
 
@@ -191,10 +204,10 @@ func (c *ApiClientImpl) CreatePreviewApplicationFormFields(ctx context.Context, 
 func (c *ApiClientImpl) UpdatePreviewApplicationFormFields(ctx context.Context, appId kintone.AppId, revision kintone.Revision, fields []kintone.Field) (kintone.Revision, error) {
 	properties := map[string]raw_client.PutPreviewAppFormFieldsRequestProperty{}
 	for _, field := range fields {
-		properties[field.Code.String()] = raw_client.PutPreviewAppFormFieldsRequestProperty{
-			Code:  field.Code.String(),
-			Label: field.Label,
-			Type:  field.FieldType.String(),
+		properties[field.Code().String()] = raw_client.PutPreviewAppFormFieldsRequestProperty{
+			Code:  field.Code().String(),
+			Label: field.Label(),
+			Type:  field.Type().String(),
 		}
 	}
 
