@@ -1,4 +1,4 @@
-PLUGINS_DIR=~/.terraform.d/plugins/darwin_amd64
+PLUGINS_DIR=~/.terraform.d/plugins/$(shell go env GOHOSTOS)_$(shell go env GOHOSTARCH)
 SOURCES=$(wildcard *.go)
 PKG_NAME=terraform-provider-kintone
 # TEST?=$$(go list ./ | grep -v 'vendor')

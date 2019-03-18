@@ -3,9 +3,7 @@ package raw_client
 import "context"
 
 type PostPreviewAppFormFieldsRequestProperty struct {
-	Code  string `json:"code"`
-	Label string `json:"label"`
-	Type  string `json:"type"`
+	FieldProperty
 }
 
 type PostPreviewAppFormFieldsRequest struct {
