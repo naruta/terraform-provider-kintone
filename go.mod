@@ -1,55 +1,9 @@
 module github.com/naruta/terraform-provider-kintone
 
-go 1.12
+go 1.13
 
 require (
-	github.com/agext/levenshtein v1.2.1
-	github.com/apparentlymart/go-cidr v1.0.0
-	github.com/apparentlymart/go-textseg v1.0.0
-	github.com/armon/go-radix v1.0.0
-	github.com/aws/aws-sdk-go v1.15.71
-	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d
-	github.com/bgentry/speakeasy v0.1.0
-	github.com/blang/semver v3.5.1+incompatible
-	github.com/davecgh/go-spew v1.1.1
-	github.com/fatih/color v1.7.0
-	github.com/golang/protobuf v1.2.0
-	github.com/google/go-cmp v0.2.0
-	github.com/hashicorp/errwrap v1.0.0
-	github.com/hashicorp/go-cleanhttp v0.5.0
-	github.com/hashicorp/go-getter v0.0.0-20180809191950-4bda8fa99001
-	github.com/hashicorp/go-hclog v0.0.0-20181001195459-61d530d6c27f
-	github.com/hashicorp/go-multierror v1.0.0
-	github.com/hashicorp/go-plugin v0.0.0-20181030172320-54b6ff97d818
-	github.com/hashicorp/go-safetemp v1.0.0
-	github.com/hashicorp/go-uuid v1.0.0
-	github.com/hashicorp/go-version v1.0.0
-	github.com/hashicorp/hcl v1.0.0
-	github.com/hashicorp/hcl2 v0.0.0-20181106230604-9aa28a1a0b53
-	github.com/hashicorp/hil v0.0.0-20170627220502-fa9f258a9250
-	github.com/hashicorp/logutils v1.0.0
-	github.com/hashicorp/terraform v0.11.10
-	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d
-	github.com/jmespath/go-jmespath v0.0.0-20160202185014-0b12d6b521d8
-	github.com/mattn/go-colorable v0.0.9
-	github.com/mattn/go-isatty v0.0.4
-	github.com/mitchellh/cli v1.0.0
-	github.com/mitchellh/copystructure v1.0.0
-	github.com/mitchellh/go-homedir v1.0.0
-	github.com/mitchellh/go-testing-interface v1.0.0
-	github.com/mitchellh/go-wordwrap v1.0.0
-	github.com/mitchellh/hashstructure v1.0.0
-	github.com/mitchellh/mapstructure v1.1.2
-	github.com/mitchellh/reflectwalk v1.0.0
-	github.com/oklog/run v1.0.0
+	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/hashicorp/terraform-plugin-sdk v1.0.0
 	github.com/pkg/errors v0.8.0
-	github.com/posener/complete v1.2.1
-	github.com/ulikunitz/xz v0.5.5
-	github.com/zclconf/go-cty v0.0.0-20181017232614-01c5aba823a6
-	golang.org/x/crypto v0.0.0-20181106171534-e4dc69e5b2fd
-	golang.org/x/net v0.0.0-20181107234226-1c5f79cfb164
-	golang.org/x/sys v0.0.0-20181107165924-66b7b1311ac8
-	golang.org/x/text v0.3.0
-	google.golang.org/genproto v0.0.0-20181107211654-5fc9ac540362
-	google.golang.org/grpc v1.16.0
 )

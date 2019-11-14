@@ -7,7 +7,6 @@ TEST?=./...
 default: clean build
 
 build:
-	# dep ensure
 	go build -o $(PKG_NAME)
 
 clean:
