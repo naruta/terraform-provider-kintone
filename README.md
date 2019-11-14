@@ -1,4 +1,4 @@
-# Terraform Provider for kintone
+# Terraform Provider for kintone [![CircleCI](https://circleci.com/gh/naruta/terraform-provider-kintone.svg?style=svg)](https://circleci.com/gh/naruta/terraform-provider-kintone)
 
 DISCLAIMER: This OSS is my own personal work and does not have any relationship with Cybozu Inc. or any other organization which I belong to.
 
