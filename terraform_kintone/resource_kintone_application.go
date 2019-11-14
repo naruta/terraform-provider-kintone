@@ -2,8 +2,8 @@ package terraform_kintone
 
 import (
 	"context"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/naruta/terraform-provider-kintone/kintone"
 	"github.com/naruta/terraform-provider-kintone/kintone/client"
 	"strings"
