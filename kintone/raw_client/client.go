@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"fmt"
+	"github.com/naruta/terraform-provider-kintone/kintone"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"math"
 	"math/rand"
 	"net/http"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -69,7 +70,11 @@ func (c *ApiClient) Call(ctx context.Context, req ApiRequest, resp interface{}) 
 			time.Sleep(getWaitDuration(retryCount))
 			continue
 		} else {
-			return errors.Errorf("status code: %s, body: %s", strconv.Itoa(httpResponse.StatusCode), string(body))
+			return kintone.ApiError{
+				RequestPath: req.Path,
+				StatusCode: httpResponse.StatusCode,
+				ResponseBody: string(body),
+			}
 		}
 	}
 

@@ -1,6 +1,20 @@
 package kintone
 
-import "context"
+import (
+	"context"
+	"fmt"
+	"strconv"
+)
+
+type ApiError struct {
+	RequestPath  string
+	StatusCode   int
+	ResponseBody string
+}
+
+func (e ApiError) Error() string {
+	return fmt.Sprintf("path: %s, status code: %s, body: %s", e.RequestPath, strconv.Itoa(e.StatusCode), e.ResponseBody)
+}
 
 type ApiClientConfig struct {
 	Host     string
