@@ -73,9 +73,9 @@ func (c *ApiClient) Call(ctx context.Context, req ApiRequest, resp interface{}) 
 			continue
 		} else {
 			return kintone.ApiError{
-				Method: req.Method,
-				RequestPath: req.Path,
-				StatusCode: httpResponse.StatusCode,
+				Method:       req.Method,
+				RequestPath:  req.Path,
+				StatusCode:   httpResponse.StatusCode,
 				ResponseBody: string(body),
 			}
 		}
