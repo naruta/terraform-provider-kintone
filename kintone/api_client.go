@@ -7,13 +7,14 @@ import (
 )
 
 type ApiError struct {
+	Method       string
 	RequestPath  string
 	StatusCode   int
 	ResponseBody string
 }
 
 func (e ApiError) Error() string {
-	return fmt.Sprintf("path: %s, status code: %s, body: %s", e.RequestPath, strconv.Itoa(e.StatusCode), e.ResponseBody)
+	return fmt.Sprintf("method: %s, path: %s, status code: %s, body: %s", e.Method, e.RequestPath, strconv.Itoa(e.StatusCode), e.ResponseBody)
 }
 
 type ApiClientConfig struct {

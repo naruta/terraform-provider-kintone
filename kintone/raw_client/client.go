@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/logging"
 	"github.com/naruta/terraform-provider-kintone/kintone"
 	"github.com/pkg/errors"
 	"io/ioutil"
@@ -42,16 +42,18 @@ func (c *ApiClient) Call(ctx context.Context, req ApiRequest, resp interface{}) 
 	}
 
 	url := req.Scheme + "://" + path.Join(c.config.Host, req.Path)
-	httpRequest, err := http.NewRequest(req.Method, url, bytes.NewReader(json))
-	if err != nil {
-		return err
-	}
-	httpRequest = httpRequest.WithContext(ctx)
-	httpRequest.Header.Set("X-Cybozu-Authorization", encodeBase64(strings.Join([]string{c.config.User, c.config.Password}, ":")))
-	httpRequest.Header.Set("Content-Type", "application/json")
 
 	for retryCount := 0; retryCount < RetryLimit; retryCount++ {
-		httpResponse, err := http.DefaultClient.Do(httpRequest)
+		httpRequest, err := http.NewRequest(req.Method, url, bytes.NewReader(json))
+		if err != nil {
+			return err
+		}
+		httpRequest = httpRequest.WithContext(ctx)
+		httpRequest.Header.Set("X-Cybozu-Authorization", encodeBase64(strings.Join([]string{c.config.User, c.config.Password}, ":")))
+		httpRequest.Header.Set("Content-Type", "application/json")
+
+		transport := logging.NewTransport("trans", http.DefaultTransport)
+		httpResponse, err := transport.RoundTrip(httpRequest)
 		if err != nil {
 			return err
 		}
@@ -71,6 +73,7 @@ func (c *ApiClient) Call(ctx context.Context, req ApiRequest, resp interface{}) 
 			continue
 		} else {
 			return kintone.ApiError{
+				Method: req.Method,
 				RequestPath: req.Path,
 				StatusCode: httpResponse.StatusCode,
 				ResponseBody: string(body),
