@@ -200,6 +200,31 @@ func (c *ApiClientImpl) FetchApplication(ctx context.Context, appId kintone.AppI
 	}, nil
 }
 
+func (c *ApiClientImpl) FetchPreviewApplicationViews(ctx context.Context, appId kintone.AppId) ([]kintone.View, error) {
+	resp, err := raw_client.GetPreviewAppViews(ctx, c.rawClient, raw_client.GetPreviewAppViewsRequest{
+		App: appId.String(),
+	})
+	if err != nil {
+		return []kintone.View{}, err
+	}
+	var views []kintone.View
+	for _, v := range resp.Views {
+		var fields []kintone.FieldCode
+		for _, f := range v.Fields {
+			fields = append(fields, kintone.FieldCode(f))
+		}
+
+		views = append(views, kintone.View{
+			Index:       v.Index,
+			Type:        kintone.ViewType(v.Type),
+			BuiltinType: v.BuiltinType,
+			Name:        v.Name,
+			Fields:      fields,
+		})
+	}
+	return views, nil
+}
+
 func (c *ApiClientImpl) CreatePreviewApplicationFormFields(ctx context.Context, appId kintone.AppId, revision kintone.Revision, fields []kintone.Field) (kintone.Revision, error) {
 	properties := map[string]raw_client.PostPreviewAppFormFieldsRequestProperty{}
 	mapper := fieldPropertyMapper{}

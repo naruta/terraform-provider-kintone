@@ -31,6 +31,7 @@ type ApiClient interface {
 	UpdatePreviewApplicationFormFields(ctx context.Context, appId AppId, revision Revision, fields []Field) (Revision, error)
 	DeletePreviewApplicationFormFields(ctx context.Context, appId AppId, revision Revision, fieldCodes []FieldCode) (Revision, error)
 	UpdatePreviewApplicationViews(ctx context.Context, appId AppId, revision Revision, views []View) (Revision, error)
+	FetchPreviewApplicationViews(ctx context.Context, appId AppId) ([]View, error)
 
 	DeployApplication(ctx context.Context, appId AppId, revision Revision) error
 	FetchApplication(ctx context.Context, appId AppId) (Application, error)

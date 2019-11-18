@@ -13,8 +13,9 @@ func (vt ViewType) String() string {
 }
 
 type View struct {
-	Index  string
-	Type   ViewType
-	Name   string
-	Fields []FieldCode
+	Index       string
+	Type        ViewType
+	BuiltinType string
+	Name        string
+	Fields      []FieldCode
 }
